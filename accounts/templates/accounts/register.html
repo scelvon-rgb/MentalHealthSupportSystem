@@ -61,6 +61,11 @@
                         </div>
 
                         {% endif %}
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.errors }}
+                        </div>
+                        {% endif %}
 
                         <form method="POST">
 

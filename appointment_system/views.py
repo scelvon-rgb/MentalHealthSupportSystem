@@ -1,15 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import FileResponse
+from django.core.mail import send_mail
+from django.conf import settings
 
 from accounts.models import UserProfile
 from .forms import AppointmentForm, SessionNoteForm
 from .models import Appointment, SessionNote
-from django.http import FileResponse
-import os
-from django.conf import settings
-
 from .reports import generate_appointment_report
 from .session_report import generate_session_note_report
+
+import os
+
+
 @login_required
 def book_appointment(request):
 
@@ -22,6 +25,24 @@ def book_appointment(request):
             appointment = form.save(commit=False)
             appointment.student = request.user
             appointment.save()
+
+            # Send confirmation email
+            if request.user.email:
+                send_mail(
+                    subject="Appointment Request Received",
+                    message=f"""
+Hello {request.user.username},
+
+Your counselling appointment request has been received successfully.
+
+You will receive another email once the counsellor approves or rejects your appointment.
+
+Thank you for using the Mental Health Support System.
+""",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[request.user.email],
+                    fail_silently=False,
+                )
 
             return redirect("dashboard")
 
@@ -36,6 +57,7 @@ def book_appointment(request):
             "form": form
         }
     )
+
 
 @login_required
 def appointment_list(request):
@@ -53,7 +75,6 @@ def appointment_list(request):
 
         appointments = Appointment.objects.all().order_by("-created_at")
 
-    # Add a flag indicating whether each appointment has a session note
     for appointment in appointments:
         appointment.has_session_note = SessionNote.objects.filter(
             appointment=appointment
@@ -86,8 +107,32 @@ def approve_appointment(request, appointment_id):
     appointment.counselor = request.user
     appointment.save()
 
-    return redirect("appointment_list")
+    # Send approval email to the student
+    if appointment.student.email:
+        send_mail(
+            subject="Appointment Approved",
+            message=f"""
+Hello {appointment.student.first_name},
 
+Good news!
+
+Your counselling appointment has been approved.
+
+Appointment Details
+
+Date: {appointment.appointment_date}
+Time: {appointment.appointment_time}
+
+Please log in to the Mental Health Support System to view your appointment.
+
+Thank you.
+""",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[appointment.student.email],
+            fail_silently=False,
+        )
+
+    return redirect("appointment_list")
 
 @login_required
 def reject_appointment(request, appointment_id):
@@ -106,12 +151,7 @@ def reject_appointment(request, appointment_id):
     appointment.counselor = request.user
     appointment.save()
 
-    return redirect("appointment_list")
-
-
-# ======================================
-# SESSION NOTES
-# ======================================
+    
 
 @login_required
 def add_session_note(request, appointment_id):
@@ -185,16 +225,22 @@ def view_session_note(request, appointment_id):
             "note": note,
         }
     )
+
+
 @login_required
 def export_appointment_report(request):
 
     profile = UserProfile.objects.get(user=request.user)
 
-    if profile.role.role_name not in ["Admin", "Administrator", "Counsellor", "Counselor"]:
+    if profile.role.role_name not in [
+        "Admin",
+        "Administrator",
+        "Counsellor",
+        "Counselor",
+    ]:
         return redirect("dashboard")
 
     reports_folder = os.path.join(settings.BASE_DIR, "reports")
-
     os.makedirs(reports_folder, exist_ok=True)
 
     pdf_path = os.path.join(
@@ -209,12 +255,19 @@ def export_appointment_report(request):
         as_attachment=True,
         filename="Appointment_Report.pdf"
     )
+
+
 @login_required
 def export_session_report(request, appointment_id):
 
     profile = UserProfile.objects.get(user=request.user)
 
-    if profile.role.role_name not in ["Counsellor", "Counselor", "Admin", "Administrator"]:
+    if profile.role.role_name not in [
+        "Counsellor",
+        "Counselor",
+        "Admin",
+        "Administrator",
+    ]:
         return redirect("dashboard")
 
     appointment = get_object_or_404(
@@ -228,7 +281,6 @@ def export_session_report(request, appointment_id):
     )
 
     reports_folder = os.path.join(settings.BASE_DIR, "reports")
-
     os.makedirs(reports_folder, exist_ok=True)
 
     pdf_path = os.path.join(

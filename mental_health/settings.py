@@ -81,8 +81,12 @@ WSGI_APPLICATION = 'mental_health.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "mental_health_db",
+        "USER": "root",
+        "PASSWORD": "Ecbf3500",
+        "HOST": "localhost",
+        "PORT": "3306",
     }
 }
 
@@ -127,3 +131,4 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

@@ -16,11 +16,20 @@ class Role(models.Model):
 class UserProfile(models.Model):
     profile_id = models.AutoField(primary_key=True)
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
 
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    role = models.ForeignKey(
+        Role,
+        on_delete=models.CASCADE
+    )
 
-    phone = models.CharField(max_length=20, blank=True)
+    phone = models.CharField(
+        max_length=20,
+        blank=True
+    )
 
     student_reg_no = models.CharField(
         max_length=50,

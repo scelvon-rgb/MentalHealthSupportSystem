@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-
+from django.core.mail import send_mail
+from django.conf import settings
 from .forms import RegistrationForm
 from .models import Role, UserProfile
 
@@ -15,31 +16,59 @@ def logout_view(request):
     logout(request)
     return redirect("login")
 
+from django.contrib import messages
 
 def register(request):
 
+    print("REGISTER VIEW CALLED")
+
     if request.method == "POST":
+
+        print("POST REQUEST RECEIVED")
 
         form = RegistrationForm(request.POST)
 
+        print("FORM CREATED")
+
         if form.is_valid():
 
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data["password"])
-            user.save()
+            print("FORM IS VALID")
 
-            student_role = Role.objects.get(
-                role_name="Student"
-            )
+            try:
+                user = form.save(commit=False)
 
-            UserProfile.objects.create(
-                user=user,
-                role=student_role,
-                phone="",
-                student_reg_no=""
-            )
+                print("USER OBJECT CREATED")
 
-            return redirect("login")
+                user.set_password(form.cleaned_data["password"])
+
+                user.save()
+
+                print("USER SAVED")
+
+                student_role = Role.objects.get(
+                    role_name="Student"
+                )
+
+                print("ROLE FOUND")
+
+                UserProfile.objects.create(
+                    user=user,
+                    role=student_role,
+                    phone="",
+                    student_reg_no=""
+                )
+
+                print("PROFILE CREATED")
+
+                return redirect("login")
+
+            except Exception as e:
+                print("REGISTRATION ERROR:", e)
+
+        else:
+
+            print("FORM ERRORS:")
+            print(form.errors)
 
     else:
 
@@ -52,7 +81,6 @@ def register(request):
             "form": form
         }
     )
-
 
 def login_view(request):
 
@@ -221,9 +249,10 @@ def dashboard(request):
 @login_required
 def view_students(request):
 
-    students = UserProfile.objects.filter(
-        role__role_name="Student"
-    )
+    students = UserProfile.objects.select_related(
+        "user",
+        "role"
+    ).all()
 
     return render(
         request,
