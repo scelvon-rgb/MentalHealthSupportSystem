@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Appointments</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+</head>
+
+<body style="background:#f4f7fc;font-family:'Poppins',sans-serif;">
+
+    <nav class="navbar navbar-dark bg-primary shadow">
+
+        <div class="container">
+
+            <a class="navbar-brand fw-bold">
+
+                🧠 Mental Health Support System
+
+            </a>
+
+            <div>
+
+                <a href="{% url 'dashboard' %}" class="btn btn-light">
+
+                    Dashboard
+
+                </a>
+
+                {% if role == "Student" %}
+
+                <a href="{% url 'book_appointment' %}" class="btn btn-success">
+
+                    Book Appointment
+
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </nav>
+
+    <div class="container mt-5">
+
+        <div class="card shadow-lg border-0 rounded-4">
+
+            <div class="card-header bg-primary text-white">
+
+                <h3 class="mb-0">
+
+                    📅 Appointment List
+
+                </h3>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if role == "Counsellor" or role == "Counselor" or role == "Admin" or role == "Administrator" %}
+
+                <div class="mb-3">
+
+                    <a href="{% url 'export_appointment_report' %}" class="btn btn-primary">
+
+                        📄 Export Appointment Report (PDF)
+
+                    </a>
+
+                </div>
+
+                {% endif %}
+
+                {% if appointments %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>Student</th>
+
+                                <th>Date</th>
+
+                                <th>Time</th>
+
+                                <th>Reason</th>
+
+                                <th>Status</th>
+
+                                {% if role == "Counsellor" or role == "Counselor" %}
+
+                                <th>Actions</th>
+
+                                {% endif %}
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for appointment in appointments %}
+
+                            <tr>
+
+                                <td>{{ appointment.student.username }}</td>
+
+                                <td>{{ appointment.appointment_date }}</td>
+
+                                <td>{{ appointment.appointment_time }}</td>
+
+                                <td>{{ appointment.reason }}</td>
+
+                                <td>
+
+                                    {% if appointment.status == "Pending" %}
+
+                                    <span class="badge bg-warning text-dark">
+
+                                        Pending
+
+                                    </span>
+
+                                    {% elif appointment.status == "Approved" %}
+
+                                    <span class="badge bg-success">
+
+                                        Approved
+
+                                    </span>
+
+                                    {% elif appointment.status == "Rejected" %}
+
+                                    <span class="badge bg-danger">
+
+                                        Rejected
+
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="badge bg-secondary">
+
+                                        Completed
+
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                {% if role == "Counsellor" or role == "Counselor" %}
+
+                                <td>
+
+                                    {% if appointment.status == "Pending" %}
+
+                                    <a href="{% url 'approve_appointment' appointment.appointment_id %}"
+                                        class="btn btn-success btn-sm mb-1">
+
+                                        Approve
+
+                                    </a>
+
+                                    <a href="{% url 'reject_appointment' appointment.appointment_id %}"
+                                        class="btn btn-danger btn-sm mb-1">
+
+                                        Reject
+
+                                    </a>
+
+                                    {% elif appointment.status == "Approved" %}
+
+                                    {% if appointment.has_session_note %}
+
+                                    <a href="{% url 'view_session_note' appointment.appointment_id %}"
+                                        class="btn btn-primary btn-sm">
+
+                                        View Note
+
+                                    </a>
+
+                                    <a href="{% url 'export_session_report' appointment.appointment_id %}"
+                                        class="btn btn-info btn-sm mt-1">
+
+                                        Export PDF
+
+                                    </a>
+
+                                    {% else %}
+
+                                    <a href="{% url 'add_session_note' appointment.appointment_id %}"
+                                        class="btn btn-warning btn-sm">
+
+                                        Add Note
+
+                                    </a>
+
+                                    {% endif %}
+
+                                    {% else %}
+
+                                    <span class="text-muted">
+
+                                        No Action
+
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                {% endif %}
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="alert alert-info text-center">
+
+                    <h5>No appointments found.</h5>
+
+                </div>
+
+                {% endif %}
+
+                <div class="text-center mt-4">
+
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+
+                        ⬅ Back to Dashboard
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,382 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mental Health Support System</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fb;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0d6efd, #5b9dff);
+            color: white;
+            padding: 100px 0;
+        }
+
+        .hero h1 {
+            font-weight: 700;
+        }
+
+        .feature-card {
+            transition: .3s;
+            border: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, .15);
+        }
+
+        .about-icon {
+            font-size: 150px;
+        }
+
+        footer {
+            background: #0d6efd;
+            color: white;
+            margin-top: 80px;
+            padding: 30px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                Mental Health Support System
+            </a>
+
+            <div>
+
+                <a href="{% url 'login' %}" class="btn btn-light me-2">
+                    Login
+                </a>
+
+                <a href="{% url 'register' %}" class="btn btn-warning">
+                    Register
+                </a>
+
+            </div>
+
+        </div>
+    </nav>
+
+    <section class="hero">
+
+        <div class="container text-center">
+
+            <h1 class="display-4">
+
+                Mental Health Support System
+
+            </h1>
+
+            <p class="lead mt-4">
+
+                A secure platform where students can track their mental wellbeing,
+                book counselling appointments, access mental health resources
+                and participate in peer support discussions.
+
+            </p>
+
+            <div class="mt-4">
+
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+                    Get Started
+                </a>
+
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                    Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section id="about" class="py-5">
+
+        <div class="container">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-6">
+
+                    <h2 class="fw-bold">
+
+                        About the System
+
+                    </h2>
+
+                    <p class="mt-4">
+
+                        The Mental Health Support System helps students monitor
+                        their emotional wellbeing, communicate with professional
+                        counsellors and access mental health resources in one secure platform.
+
+                    </p>
+
+                    <p>
+
+                        It promotes early intervention, confidentiality,
+                        self-awareness and timely counselling support.
+
+                    </p>
+
+                </div>
+
+                <div class="col-lg-6 text-center">
+
+                    <div class="about-icon">
+
+                        🧠
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section id="features" class="py-5">
+
+        <div class="container">
+
+            <h2 class="text-center fw-bold mb-5">
+
+                Our Features
+
+            </h2>
+
+            <div class="row g-4">
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card feature-card shadow h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>😊</h1>
+
+                            <h4>Mood Tracking</h4>
+
+                            <p>
+
+                                Record daily moods and monitor emotional wellbeing.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card feature-card shadow h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>📅</h1>
+
+                            <h4>Appointments</h4>
+
+                            <p>
+
+                                Book counselling appointments online.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card feature-card shadow h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>📚</h1>
+
+                            <h4>Resources</h4>
+
+                            <p>
+
+                                Access mental health articles and educational materials.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card feature-card shadow h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>💬</h1>
+
+                            <h4>Discussion Forum</h4>
+
+                            <p>
+
+                                Participate in anonymous peer support discussions.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card feature-card shadow h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>📄</h1>
+
+                            <h4>PDF Reports</h4>
+
+                            <p>
+
+                                Download appointment, mood and counselling reports.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card feature-card shadow h-100">
+
+                        <div class="card-body text-center">
+
+                            <h1>🔒</h1>
+
+                            <h4>Secure Access</h4>
+
+                            <p>
+
+                                Role-based authentication keeps information confidential.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section id="contact" class="py-5">
+
+        <div class="container">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body text-center">
+
+                    <h2 class="fw-bold">
+
+                        Contact Us
+
+                    </h2>
+
+                    <p class="mt-4">
+
+                        📧 support@mentalhealthsystem.com
+
+                    </p>
+
+                    <p>
+
+                        📞 +254 140232651
+
+                    </p>
+
+                    <p>
+
+                        📍 Kabarak University
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <footer class="text-center">
+
+        <h5>
+
+            Mental Health Support System
+
+        </h5>
+
+        <p>
+
+            Developed by Scelvon Nitchelle
+
+        </p>
+
+        <p>
+
+            © 2026 All Rights Reserved
+
+        </p>
+
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
+```
