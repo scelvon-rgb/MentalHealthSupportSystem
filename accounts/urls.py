@@ -8,18 +8,21 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("dashboard/", views.dashboard, name="dashboard"),
 
-    path("students/", views.view_students, name="view_students"),
+    path("manage-users/", views.manage_users, name="manage_users"),
+    path("add-user/", views.add_user, name="add_user"),
 
     path(
         "students/<int:user_id>/",
         views.student_mood_history,
         name="student_mood_history"
     ),
+    path(
+    "students/",
+    views.view_students,
+    name="view_students",
+),
 
-    # ==========================
-    # PASSWORD RESET URLS
-    # ==========================
-
+    # PASSWORD RESET
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(
@@ -54,4 +57,28 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+
+    path("profile/", views.profile, name="profile"),
+    path(
+    "settings/",
+    views.settings,
+    name="settings"
+),
+path(
+    "notifications/",
+    views.notifications,
+    name="notifications",
+),
+
+path(
+    "notifications/read/<int:notification_id>/",
+    views.mark_notification_read,
+    name="mark_notification_read",
+),
+
+path(
+    "notifications/delete/<int:notification_id>/",
+    views.delete_notification,
+    name="delete_notification",
+),
 ]

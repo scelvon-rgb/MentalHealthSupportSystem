@@ -1,0 +1,123 @@
+<div class="sidebar">
+
+    <div class="logo">
+        <h3>🧠 MHSS</h3>
+        <p>Mental Health Support System</p>
+    </div>
+
+    <div class="profile-card">
+
+        <div class="avatar">
+            👤
+        </div>
+
+        <h5>{{ request.user.first_name }} {{ request.user.last_name }}</h5>
+
+        <small>{{ role }}</small>
+
+    </div>
+
+    <ul class="menu">
+
+        <li>
+            <a href="{% url 'dashboard' %}">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+        </li>
+
+        <li class="menu-title">
+            Mood Tracker
+        </li>
+
+        <li>
+            <a href="{% url 'mood_checkin' %}">
+                😊 Mood Check-in
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'mood_history' %}">
+                📜 Mood History
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'mood_analytics' %}">
+                📈 Mood Analytics
+            </a>
+        </li>
+
+        <li class="menu-title">
+            Appointments
+        </li>
+
+        <li>
+            <a href="{% url 'appointment_list' %}">
+                📅 View Appointments
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'book_appointment' %}">
+                ➕ Book Appointment
+            </a>
+        </li>
+
+        <li class="menu-title">
+            Resources
+        </li>
+
+        <li>
+            <a href="{% url 'resource_list' %}">
+                📚 View Resources
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'add_resource' %}">
+                ➕ Add Resource
+            </a>
+        </li>
+
+        <li class="menu-title">
+            Forum
+        </li>
+
+        <li>
+            <a href="{% url 'forum_list' %}">
+                💬 Forum
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'create_post' %}">
+                ✍ Create Post
+            </a>
+        </li>
+
+        <li class="menu-title">
+            Account
+        </li>
+
+        <li>
+            <a href="{% url 'profile' %}">
+                👤 Profile
+            </a>
+        </li>
+
+        <li>
+            <a href="#">
+                ⚙ Settings
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'logout' %}">
+                🚪 Logout
+            </a>
+        </li>
+
+    </ul>
+
+</div>

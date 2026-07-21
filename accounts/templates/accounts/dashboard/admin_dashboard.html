@@ -35,27 +35,23 @@
             <div>
 
                 <a href="{% url 'dashboard' %}" class="btn btn-light">
-
                     Dashboard
+                </a>
 
+                <a href="{% url 'manage_users' %}" class="btn btn-dark">
+                    👥 Manage Users
+                </a>
+
+                <a href="{% url 'add_user' %}" class="btn btn-success">
+                    ➕ Add User
                 </a>
 
                 <a href="{% url 'appointment_list' %}" class="btn btn-warning">
-
                     Appointments
-
-                </a>
-
-                <a href="{% url 'view_students' %}" class="btn btn-success">
-
-                    Students
-
                 </a>
 
                 <a href="{% url 'logout' %}" class="btn btn-danger">
-
                     Logout
-
                 </a>
 
             </div>

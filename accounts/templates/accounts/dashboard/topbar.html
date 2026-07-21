@@ -1,0 +1,119 @@
+<div class="topbar d-flex justify-content-between align-items-center">
+
+    <div class="d-flex align-items-center">
+
+        <button class="btn btn-outline-primary me-3" id="menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div>
+            <h4 class="mb-0 fw-bold">
+                Dashboard
+            </h4>
+
+            <small class="text-muted">
+                Mental Health Support System
+            </small>
+        </div>
+
+    </div>
+
+    <div class="d-flex align-items-center">
+
+        <!-- Notification -->
+
+        <button class="btn btn-light position-relative me-3">
+
+            <i class="fas fa-bell fs-5"></i>
+
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                3
+            </span>
+
+        </button>
+
+        <!-- User Dropdown -->
+
+        <div class="dropdown">
+
+            <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button"
+                data-bs-toggle="dropdown">
+
+                {% if profile.profile_picture %}
+
+                <img src="{{ profile.profile_picture.url }}" width="40" height="40" class="rounded-circle me-2">
+
+                {% else %}
+
+                <img src="https://ui-avatars.com/api/?name={{request.user.first_name}}+{{request.user.last_name}}&background=0d6efd&color=fff"
+                    width="40" height="40" class="rounded-circle me-2">
+
+                {% endif %}
+
+                <strong>{{ request.user.first_name }}</strong>
+
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+
+                <li class="dropdown-header">
+
+                    <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>
+
+                    <br>
+
+                    <small>{{ request.user.email }}</small>
+
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <li>
+
+                    <a class="dropdown-item" href="{% url 'profile' %}">
+
+                        <i class="fas fa-user me-2"></i>
+
+                        My Profile
+
+                    </a>
+
+                </li>
+
+                <li>
+
+                    <a class="dropdown-item" href="#">
+
+                        <i class="fas fa-gear me-2"></i>
+
+                        Settings
+
+                    </a>
+
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <li>
+
+                    <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+
+                        <i class="fas fa-right-from-bracket me-2"></i>
+
+                        Logout
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>

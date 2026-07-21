@@ -89,7 +89,6 @@ DATABASES = {
         "PORT": "3306",
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -132,3 +131,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+DEBUG = True
