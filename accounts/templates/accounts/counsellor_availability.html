@@ -1,0 +1,81 @@
+{% extends "accounts/dashboard/base_dashboard.html" %}
+
+{% block page_title %}
+Counsellor Availability
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-7">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        Counsellor Availability
+                    </h3>
+                </div>
+
+                <div class="card-body">
+
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Current Status
+                            </label>
+
+                            <select name="availability" class="form-select">
+
+                                <option value="Available" {% if profile.availability == "Available" %}selected{% endif %}>
+                                    🟢 Available
+                                </option>
+
+                                <option value="Busy" {% if profile.availability == "Busy" %}selected{% endif %}>
+                                    🟡 Busy
+                                </option>
+
+                                <option value="Offline" {% if profile.availability == "Offline" %}selected{% endif %}>
+                                    🔴 Offline
+                                </option>
+
+                                <option value="On Leave" {% if profile.availability == "On Leave" %}selected{% endif %}>
+                                    🌴 On Leave
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Save Availability
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

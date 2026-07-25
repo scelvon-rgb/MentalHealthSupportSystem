@@ -2,19 +2,22 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 from .forms import RegistrationForm, ProfileForm, AdminUserCreationForm
-from .models import Role, UserProfile, Notification
+from .models import UserProfile, Role, Notification
 
 from mood_tracker.models import Mood
 from appointment_system.models import Appointment
 from resources.models import Resource
 from forum.models import ForumPost
+from django.core.mail import send_mail
+from django.conf import settings
 
-from django.db.models import Count
 def logout_view(request):
     logout(request)
     return redirect("login")
+
 def register(request):
 
     if request.method == "POST":
@@ -23,36 +26,90 @@ def register(request):
 
         if form.is_valid():
 
-            try:
-                user = form.save(commit=False)
-                user.set_password(form.cleaned_data["password"])
-                user.save()
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data["password"])
+            user.save()
 
-                # Every public registration becomes a Student
-                student_role = Role.objects.get(role_name="Student")
+            selected_role = form.cleaned_data["role"]
 
-                UserProfile.objects.create(
-                    user=user,
-                    role=student_role,
-                    phone="",
-                    student_reg_no=""
+            approved = True
+
+            if selected_role.role_name == "Counsellor":
+                approved = False
+
+            UserProfile.objects.create(
+                user=user,
+                role=selected_role,
+                phone="",
+                student_reg_no="",
+                is_approved=approved,
+            )
+            print("Sending email to:", user.email)
+
+            # ==========================
+            # STUDENT EMAIL
+            # ==========================
+            if approved:
+
+                send_mail(
+                    subject="Welcome to the Mental Health Support System",
+                    message=f"""
+Hello {user.first_name},
+
+Thank you for registering for the Mental Health Support System.
+
+Your account has been created successfully and is now active.
+
+You can now log in using your username and password.
+
+Regards,
+Mental Health Support System Team
+                    """,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=False,
                 )
 
                 messages.success(
                     request,
-                    "Registration successful. Please login."
+                    "Registration successful. Please log in."
                 )
 
-                return redirect("login")
+            # ==========================
+            # COUNSELLOR EMAIL
+            # ==========================
+            else:
 
-            except Exception as e:
-                print("REGISTRATION ERROR:", e)
-                messages.error(
+                send_mail(
+                    subject="Counsellor Registration Received",
+                    message=f"""
+Hello {user.first_name},
+
+Thank you for registering as a counsellor.
+
+Your registration has been received successfully.
+
+Your account is currently awaiting administrator approval.
+
+You will receive another email immediately after your account has been approved.
+
+Regards,
+Mental Health Support System Team
+                    """,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=False,
+                )
+
+                messages.success(
                     request,
-                    "Registration failed."
+                    "Thank you for registering as a counsellor. Please wait for administrator approval."
                 )
+
+            return redirect("login")
 
     else:
+
         form = RegistrationForm()
 
     return render(
@@ -62,13 +119,12 @@ def register(request):
             "form": form,
         },
     )
-
 def login_view(request):
 
     if request.method == "POST":
 
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get("username")
+        password = request.POST.get("password")
 
         user = authenticate(
             request,
@@ -76,7 +132,23 @@ def login_view(request):
             password=password,
         )
 
-        if user is not None:
+        if user:
+
+            profile = UserProfile.objects.get(user=user)
+
+            if (
+                profile.role.role_name in ["Counsellor", "Counselor"]
+                and not profile.is_approved
+            ):
+
+                return render(
+                    request,
+                    "accounts/login.html",
+                    {
+                        "waiting_for_approval": True
+                    }
+                )
+
             login(request, user)
             return redirect("dashboard")
 
@@ -84,12 +156,11 @@ def login_view(request):
             request,
             "accounts/login.html",
             {
-                "error": "Invalid username or password",
-            },
+                "error": "Invalid username or password."
+            }
         )
 
     return render(request, "accounts/login.html")
-
 @login_required
 def dashboard(request):
 
@@ -318,7 +389,7 @@ def profile(request):
 
 
 @login_required
-def settings(request):
+def settings_view(request):
 
     profile = UserProfile.objects.get(user=request.user)
 
@@ -445,9 +516,9 @@ def manage_users(request):
         return redirect("dashboard")
 
     users = UserProfile.objects.select_related(
-        "user",
-        "role"
-    )
+    "user",
+    "role"
+).order_by("user__first_name")
 
     search = request.GET.get("search")
 
@@ -473,11 +544,57 @@ def manage_users(request):
         },
     )
 @login_required
+def approve_counsellor(request, profile_id):
+
+    admin = UserProfile.objects.get(user=request.user)
+
+    if admin.role.role_name not in ["Admin", "Administrator"]:
+        messages.error(request, "Access denied.")
+        return redirect("dashboard")
+
+    profile = UserProfile.objects.get(profile_id=profile_id)
+
+    profile.is_approved = True
+    profile.save()
+
+    Notification.objects.create(
+        user=profile.user,
+        title="Account Approved",
+        message="Your counsellor account has been approved. You can now log in."
+    )
+
+    messages.success(request, "Counsellor approved successfully.")
+
+    return redirect("manage_users")
+
+
+@login_required
+def reject_counsellor(request, profile_id):
+
+    admin = UserProfile.objects.get(user=request.user)
+
+    if admin.role.role_name not in ["Admin", "Administrator"]:
+        messages.error(request, "Access denied.")
+        return redirect("dashboard")
+
+    profile = UserProfile.objects.get(profile_id=profile_id)
+
+    Notification.objects.create(
+        user=profile.user,
+        title="Account Rejected",
+        message="Your counsellor registration has been rejected."
+    )
+
+    profile.user.delete()
+
+    messages.success(request, "Counsellor rejected.")
+
+    return redirect("manage_users")
+@login_required
 def add_user(request):
 
     profile = UserProfile.objects.get(user=request.user)
 
-    # Only Admins can access this page
     if profile.role.role_name not in ["Admin", "Administrator"]:
         messages.error(request, "Access denied.")
         return redirect("dashboard")
@@ -492,12 +609,28 @@ def add_user(request):
             user.set_password(form.cleaned_data["password"])
             user.save()
 
+            selected_role = form.cleaned_data["role"]
+
+            approved = True
+
+            if selected_role.role_name == "Counsellor":
+                approved = False
+
             UserProfile.objects.create(
                 user=user,
-                role=form.cleaned_data["role"],
+                role=selected_role,
                 phone="",
-                student_reg_no=""
+                student_reg_no="",
+                is_approved=approved,
             )
+
+            if not approved:
+
+                Notification.objects.create(
+                    user=user,
+                    title="Registration Submitted",
+                    message="Your counsellor account is waiting for administrator approval."
+                )
 
             messages.success(
                 request,
@@ -518,5 +651,51 @@ def add_user(request):
             "profile": profile,
             "role": profile.role.role_name,
             "active_page": "manage_users",
+        },
+    )
+@login_required
+def counsellor_availability(request):
+
+    profile = UserProfile.objects.get(user=request.user)
+
+    if profile.role.role_name != "Counsellor":
+        messages.error(request, "Access denied.")
+        return redirect("dashboard")
+
+    if request.method == "POST":
+
+        profile.availability = request.POST.get("availability")
+        profile.save()
+
+        messages.success(
+            request,
+            "Availability updated successfully."
+        )
+
+        return redirect("counsellor_availability")
+
+    return render(
+        request,
+        "accounts/counsellor_availability.html",
+        {
+            "profile": profile,
+            "role": profile.role.role_name,
+            "active_page": "availability",
+        },
+    )
+
+@login_required
+def available_counsellors(request):
+
+    counsellors = UserProfile.objects.filter(
+        role__role_name="Counsellor",
+        is_approved=True
+    ).select_related("user")
+
+    return render(
+        request,
+        "accounts/available_counsellors.html",
+        {
+            "counsellors": counsellors,
         },
     )

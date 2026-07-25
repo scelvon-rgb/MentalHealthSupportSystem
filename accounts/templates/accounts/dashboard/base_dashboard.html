@@ -235,66 +235,112 @@
 
         <a href="{% url 'dashboard' %}" class="{% if active_page == 'dashboard' %}active{% endif %}">
             🏠 Dashboard
-        </a>
-        {% if role == "Student" %}
 
-        <a href="{% url 'mood_checkin' %}" class="{% if active_page == 'mood_checkin' %}active{% endif %}">
-            😊 Mood Check-In
-        </a>
+            {% if role == "Student" %}
 
-        <a href="{% url 'mood_history' %}" class="{% if active_page == 'mood_history' %}active{% endif %}">
-            📊 Mood History
-        </a>
+            <a href="{% url 'mood_checkin' %}" class="{% if active_page == 'mood_checkin' %}active{% endif %}">
+                😊 Mood Check-In
+            </a>
 
-        <a href="{% url 'appointment_list' %}" class="{% if active_page == 'appointments' %}active{% endif %}">
-            📅 Appointments
-        </a>
+            <a href="{% url 'mood_history' %}" class="{% if active_page == 'mood_history' %}active{% endif %}">
+                📊 Mood History
+            </a>
 
-        {% endif %}
+            <a href="{% url 'available_counsellors' %}"
+                class="{% if active_page == 'available_counsellors' %}active{% endif %}">
+                👨‍⚕️ Available Counsellors
+            </a>
 
-        {% if role == "Counsellor" or role == "Counselor" %}
+            <a href="{% url 'appointment_list' %}" class="{% if active_page == 'appointments' %}active{% endif %}">
+                📅 Appointments
+            </a>
 
-        <a href="{% url 'appointment_list' %}">
-            <i class="fas fa-calendar-check"></i>
-            Appointments
-        </a>
+            {% endif %}
 
-        <a href="{% url 'view_students' %}">
-            <i class="fas fa-user-graduate"></i>
-            Students
-        </a>
 
-        {% endif %}
 
-        {% if role == "Admin" or role == "Administrator" %}
+            {% if role == "Counsellor" or role == "Counselor" %}
 
-        <a href="{% url 'view_students' %}">
-            <i class="fas fa-users"></i>
-            Users
-        </a>
+            <a href="{% url 'appointment_list' %}">
+                <i class="fas fa-calendar-check"></i>
+                Appointments
+            </a>
 
-        {% endif %}
+            <a href="{% url 'view_students' %}">
+                <i class="fas fa-user-graduate"></i>
+                Students
+            </a>
 
-        <a href="{% url 'resource_list' %}" class="{% if active_page == 'resources' %}active{% endif %}">
-            📚 Resources
-        </a>
+            <a href="{% url 'counsellor_availability' %}">
+                <i class="fas fa-user-clock"></i>
+                My Availability
+            </a>
+            <a href="{% url 'pending_appointments' %}">
+                <i class="fas fa-calendar-plus"></i>
+                Pending Requests
+            </a>
 
-        <a href="{% url 'forum_list' %}" class="{% if active_page == 'forum' %}active{% endif %}">
-            💬 Forum
-        </a>
+            <div class="text-center mt-3">
 
-        <a href="{% url 'profile' %}" class="{% if active_page == 'profile' %}active{% endif %}">
-            👤 My Profile
-        </a>
+                {% if profile.availability == "Available" %}
 
-        <a href="{% url 'settings' %}" class="{% if active_page == 'settings' %}active{% endif %}">
-            ⚙ Settings
-        </a>
+                <span class="badge bg-success">
+                    🟢 Available
+                </span>
 
-        <a href="{% url 'logout' %}">
-            <i class="fas fa-right-from-bracket"></i>
-            Logout
-        </a>
+                {% elif profile.availability == "Busy" %}
+
+                <span class="badge bg-warning text-dark">
+                    🟡 Busy
+                </span>
+
+                {% elif profile.availability == "Offline" %}
+
+                <span class="badge bg-danger">
+                    🔴 Offline
+                </span>
+
+                {% elif profile.availability == "On Leave" %}
+
+                <span class="badge bg-secondary">
+                    🌴 On Leave
+                </span>
+
+                {% endif %}
+
+            </div>
+
+            {% endif %}
+
+            {% if role == "Admin" or role == "Administrator" %}
+
+            <a href="{% url 'view_students' %}">
+                <i class="fas fa-users"></i>
+                Users
+            </a>
+
+            {% endif %}
+
+            <a href="{% url 'resource_list' %}" class="{% if active_page == 'resources' %}active{% endif %}">
+                📚 Resources
+            </a>
+
+            <a href="{% url 'forum_list' %}" class="{% if active_page == 'forum' %}active{% endif %}">
+                💬 Forum
+            </a>
+
+            <a href="{% url 'profile' %}" class="{% if active_page == 'profile' %}active{% endif %}">
+                👤 My Profile
+            </a>
+
+            <a href="{% url 'settings' %}" class="{% if active_page == 'settings' %}active{% endif %}">
+                ⚙ Settings
+            </a>
+
+            <a href="{% url 'logout' %}">
+                <i class="fas fa-right-from-bracket"></i>
+                Logout
+            </a>
 
     </div>
 

@@ -48,4 +48,20 @@ path(
     views.export_session_report,
     name="export_session_report"
 ),
+path(
+    "pending/",
+    views.pending_appointments,
+    name="pending_appointments",
+),
+
+path(
+    "approve/<int:appointment_id>/",
+    views.approve_appointment,
+    name="approve_appointment",
+),
+path(
+    "my-sessions/",
+    views.my_sessions,
+    name="my_sessions",
+),
 ]

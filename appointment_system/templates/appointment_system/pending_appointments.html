@@ -1,0 +1,103 @@
+{% extends "accounts/base_dashboard.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2 class="mb-4">
+
+        Pending Appointment Requests
+
+    </h2>
+
+    {% if appointments %}
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-primary">
+
+            <tr>
+
+                <th>Student</th>
+
+                <th>Date</th>
+
+                <th>Time</th>
+
+                <th>Type</th>
+
+                <th>Reason</th>
+
+                <th></th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for appointment in appointments %}
+
+            <tr>
+
+                <td>
+
+                    {{ appointment.student.get_full_name }}
+
+                </td>
+
+                <td>
+
+                    {{ appointment.appointment_date }}
+
+                </td>
+
+                <td>
+
+                    {{ appointment.appointment_time }}
+
+                </td>
+
+                <td>
+
+                    {{ appointment.appointment_type }}
+
+                </td>
+
+                <td>
+
+                    {{ appointment.reason|truncatewords:12 }}
+
+                </td>
+
+                <td>
+
+                    <a href="{% url 'approve_appointment' appointment.appointment_id %}" class="btn btn-success">
+
+                        Accept
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <div class="alert alert-info">
+
+        No pending appointments.
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

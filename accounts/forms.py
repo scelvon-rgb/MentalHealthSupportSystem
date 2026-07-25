@@ -17,6 +17,14 @@ class RegistrationForm(forms.ModelForm):
         )
     )
 
+    role = forms.ModelChoiceField(
+        queryset=Role.objects.exclude(role_name="Admin"),
+        empty_label="Select Role",
+        widget=forms.Select(
+            attrs={"class": "form-select"}
+        )
+    )
+
     class Meta:
         model = User
 
@@ -27,6 +35,7 @@ class RegistrationForm(forms.ModelForm):
             "email",
             "password",
             "confirm_password",
+            "role",
         ]
 
         widgets = {

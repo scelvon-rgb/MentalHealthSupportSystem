@@ -49,6 +49,18 @@
                             {{ error }}
                         </div>
                         {% endif %}
+                        {% if waiting_for_approval %}
+<div class="alert alert-warning text-center">
+
+    <h5>⏳ Waiting for Approval</h5>
+
+    <p>
+        Your counsellor account has been registered successfully.
+        Please wait for an administrator to approve your account before logging in.
+    </p>
+
+</div>
+{% endif %}
 
                         <form method="POST">
 

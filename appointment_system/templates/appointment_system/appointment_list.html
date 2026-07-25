@@ -128,40 +128,95 @@
 
                                 <td>{{ appointment.appointment_time }}</td>
 
-                                <td>{{ appointment.reason }}</td>
+                                <td>
+
+                                    <strong>Reason:</strong><br>
+                                    {{ appointment.reason }}
+
+                                    <hr>
+
+                                    <strong>Type:</strong>
+                                    {{ appointment.appointment_type }}
+
+                                    <br><br>
+
+                                    <strong>Counsellor:</strong>
+
+                                    {% if appointment.counselor %}
+
+                                    {{ appointment.counselor.get_full_name|default:appointment.counselor.username }}
+
+                                    {% else %}
+
+                                    Not assigned yet
+
+                                    {% endif %}
+
+                                    <br><br>
+
+                                    {% if appointment.appointment_type == "Online" %}
+
+                                    <strong>Meeting Link:</strong><br>
+
+                                    {% if appointment.meeting_link %}
+
+                                    <a href="{{ appointment.meeting_link }}" target="_blank"
+                                        class="btn btn-primary btn-sm mt-1">
+                                        Join Meeting
+                                    </a>
+
+                                    {% else %}
+
+                                    <span class="text-muted">
+                                        Waiting for counsellor...
+                                    </span>
+
+                                    {% endif %}
+
+                                    {% else %}
+
+                                    <strong>Location:</strong><br>
+
+                                    {% if appointment.meeting_location %}
+
+                                    {{ appointment.meeting_location }}
+
+                                    {% else %}
+
+                                    <span class="text-muted">
+                                        Waiting for counsellor...
+                                    </span>
+
+                                    {% endif %}
+
+                                    {% endif %}
+
+                                </td>
 
                                 <td>
 
                                     {% if appointment.status == "Pending" %}
 
                                     <span class="badge bg-warning text-dark">
-
                                         Pending
-
                                     </span>
 
                                     {% elif appointment.status == "Approved" %}
 
                                     <span class="badge bg-success">
-
                                         Approved
-
                                     </span>
 
                                     {% elif appointment.status == "Rejected" %}
 
                                     <span class="badge bg-danger">
-
                                         Rejected
-
                                     </span>
 
                                     {% else %}
 
                                     <span class="badge bg-secondary">
-
                                         Completed
-
                                     </span>
 
                                     {% endif %}
@@ -182,7 +237,7 @@
                                     </a>
 
                                     <a href="{% url 'reject_appointment' appointment.appointment_id %}"
-                                        class="btn btn-danger btn-sm mb-1">
+                                        class="btn btn-danger btn-sm">
 
                                         Reject
 
@@ -199,13 +254,6 @@
 
                                     </a>
 
-                                    <a href="{% url 'export_session_report' appointment.appointment_id %}"
-                                        class="btn btn-info btn-sm mt-1">
-
-                                        Export PDF
-
-                                    </a>
-
                                     {% else %}
 
                                     <a href="{% url 'add_session_note' appointment.appointment_id %}"
@@ -216,14 +264,6 @@
                                     </a>
 
                                     {% endif %}
-
-                                    {% else %}
-
-                                    <span class="text-muted">
-
-                                        No Action
-
-                                    </span>
 
                                     {% endif %}
 

@@ -27,29 +27,21 @@
         <div class="container">
 
             <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
-
                 🧠 Mental Health Support System
-
             </a>
 
             <div>
 
                 <a href="{% url 'forum_list' %}" class="btn btn-light me-2">
-
                     Forum
-
                 </a>
 
                 <a href="{% url 'dashboard' %}" class="btn btn-warning me-2">
-
                     Dashboard
-
                 </a>
 
                 <a href="{% url 'logout' %}" class="btn btn-danger">
-
                     Logout
-
                 </a>
 
             </div>
@@ -80,7 +72,31 @@
 
                             {% csrf_token %}
 
-                            {{ form.as_p }}
+                            <div class="mb-3">
+
+                                {{ form.title.label_tag }}
+
+                                {{ form.title }}
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                {{ form.content.label_tag }}
+
+                                {{ form.content }}
+
+                            </div>
+
+                            <div class="form-check mb-3">
+
+                                {{ form.anonymous }}
+
+                                <label class="form-check-label" for="{{ form.anonymous.id_for_label }}">
+                                    Post anonymously
+                                </label>
+
+                            </div>
 
                             <button type="submit" class="btn btn-success">
 

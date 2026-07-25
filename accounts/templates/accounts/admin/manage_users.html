@@ -36,9 +36,7 @@ Manage Users
                         placeholder="Search by name, email or username..." value="{{ request.GET.search }}">
 
                     <button class="btn btn-primary">
-
                         <i class="fas fa-search"></i>
-
                     </button>
 
                 </div>
@@ -61,7 +59,7 @@ Manage Users
                         <th>Email</th>
                         <th>Role</th>
                         <th>Status</th>
-                        <th width="220">Actions</th>
+                        <th width="260">Actions</th>
 
                     </tr>
 
@@ -89,50 +87,48 @@ Manage Users
                         </td>
 
                         <td>
-
                             {{ user.user.first_name }}
                             {{ user.user.last_name }}
-
                         </td>
 
                         <td>
-
                             {{ user.user.username }}
-
                         </td>
 
                         <td>
-
                             {{ user.user.email }}
-
                         </td>
 
                         <td>
 
                             <span class="badge bg-primary">
-
                                 {{ user.role.role_name }}
-
                             </span>
 
                         </td>
 
                         <td>
 
-                            {% if user.user.is_active %}
+                            {% if user.role.role_name == "Counsellor" %}
+
+                            {% if user.is_approved %}
 
                             <span class="badge bg-success">
-
-                                Active
-
+                                Approved
                             </span>
 
                             {% else %}
 
-                            <span class="badge bg-danger">
+                            <span class="badge bg-warning text-dark">
+                                Pending Approval
+                            </span>
 
-                                Disabled
+                            {% endif %}
 
+                            {% else %}
+
+                            <span class="badge bg-success">
+                                Active
                             </span>
 
                             {% endif %}
@@ -141,35 +137,25 @@ Manage Users
 
                         <td>
 
+                            {% if user.role.role_name == "Counsellor" and not user.is_approved %}
+
+                            <a href="{% url 'approve_counsellor' user.profile_id %}" class="btn btn-success btn-sm">
+                                Approve
+                            </a>
+
+                            <a href="{% url 'reject_counsellor' user.profile_id %}" class="btn btn-danger btn-sm">
+                                Reject
+                            </a>
+
+                            {% endif %}
+
                             <a href="#" class="btn btn-warning btn-sm">
-
-                                <i class="fas fa-edit"></i>
-
+                                Edit
                             </a>
 
                             <a href="#" class="btn btn-danger btn-sm">
-
-                                <i class="fas fa-trash"></i>
-
+                                Delete
                             </a>
-
-                            {% if user.user.is_active %}
-
-                            <a href="#" class="btn btn-secondary btn-sm">
-
-                                Disable
-
-                            </a>
-
-                            {% else %}
-
-                            <a href="#" class="btn btn-success btn-sm">
-
-                                Enable
-
-                            </a>
-
-                            {% endif %}
 
                         </td>
 

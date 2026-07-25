@@ -8,6 +8,12 @@ class Appointment(models.Model):
         ("Pending", "Pending"),
         ("Approved", "Approved"),
         ("Rejected", "Rejected"),
+        ("Completed", "Completed"),
+    ]
+
+    APPOINTMENT_TYPE_CHOICES = [
+        ("Online", "Online"),
+        ("Physical", "Physical"),
     ]
 
     appointment_id = models.AutoField(primary_key=True)
@@ -32,13 +38,35 @@ class Appointment(models.Model):
 
     reason = models.TextField()
 
+    # NEW FIELD
+    appointment_type = models.CharField(
+        max_length=20,
+        choices=APPOINTMENT_TYPE_CHOICES,
+        default="Physical"
+    )
+
+    # For online appointments
+    meeting_link = models.URLField(
+        blank=True,
+        null=True
+    )
+
+    # For physical appointments
+    meeting_location = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default="Pending"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
         db_table = "appointments"
@@ -73,6 +101,16 @@ class SessionNote(models.Model):
         blank=True,
         null=True
     )
+    meeting_link = models.URLField(
+        blank=True,
+        null=True
+    )
+
+    meeting_location = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
 
     created_at = models.DateTimeField(
         auto_now_add=True
@@ -83,3 +121,7 @@ class SessionNote(models.Model):
 
     def __str__(self):
         return f"Session Note - {self.appointment.student.username}"
+    rejection_reason = models.TextField(
+    blank=True,
+    null=True
+)

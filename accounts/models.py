@@ -11,8 +11,6 @@ class Role(models.Model):
 
     def __str__(self):
         return self.role_name
-
-
 class UserProfile(models.Model):
     profile_id = models.AutoField(primary_key=True)
 
@@ -24,6 +22,29 @@ class UserProfile(models.Model):
     role = models.ForeignKey(
         Role,
         on_delete=models.CASCADE
+    )
+
+    # Counsellor approval
+    is_approved = models.BooleanField(
+        default=False
+    )
+    rejection_reason = models.TextField(
+    blank=True,
+    null=True
+)
+
+    # Counsellor availability
+    AVAILABILITY_CHOICES = [
+        ("Available", "Available"),
+        ("Busy", "Busy"),
+        ("Offline", "Offline"),
+        ("On Leave", "On Leave"),
+    ]
+
+    availability = models.CharField(
+        max_length=20,
+        choices=AVAILABILITY_CHOICES,
+        default="Available"
     )
 
     phone = models.CharField(
@@ -48,8 +69,6 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
-
-
 class Notification(models.Model):
     notification_id = models.AutoField(primary_key=True)
 

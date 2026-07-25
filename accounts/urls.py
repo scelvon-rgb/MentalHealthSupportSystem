@@ -21,6 +21,17 @@ urlpatterns = [
     views.view_students,
     name="view_students",
 ),
+path(
+    "approve-counsellor/<int:profile_id>/",
+    views.approve_counsellor,
+    name="approve_counsellor",
+),
+
+path(
+    "reject-counsellor/<int:profile_id>/",
+    views.reject_counsellor,
+    name="reject_counsellor",
+),
 
     # PASSWORD RESET
     path(
@@ -59,11 +70,7 @@ urlpatterns = [
     ),
 
     path("profile/", views.profile, name="profile"),
-    path(
-    "settings/",
-    views.settings,
-    name="settings"
-),
+    path("settings/", views.settings_view, name="settings"),
 path(
     "notifications/",
     views.notifications,
@@ -80,5 +87,15 @@ path(
     "notifications/delete/<int:notification_id>/",
     views.delete_notification,
     name="delete_notification",
+),
+path(
+    "availability/",
+    views.counsellor_availability,
+    name="counsellor_availability",
+),
+path(
+    "available-counsellors/",
+    views.available_counsellors,
+    name="available_counsellors",
 ),
 ]

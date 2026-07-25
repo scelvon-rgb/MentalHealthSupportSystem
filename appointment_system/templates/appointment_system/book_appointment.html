@@ -74,17 +74,41 @@
 
                             {% csrf_token %}
 
-                            {{ form.as_p }}
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Appointment Date
+                                </label>
 
-                            <div class="d-grid mt-4">
-
-                                <button type="submit" class="btn btn-success btn-lg">
-
-                                    Submit Appointment Request
-
-                                </button>
-
+                                {{ form.appointment_date }}
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Appointment Time
+                                </label>
+
+                                {{ form.appointment_time }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Appointment Type
+                                </label>
+
+                                {{ form.appointment_type }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Reason
+                                </label>
+
+                                {{ form.reason }}
+                            </div>
+
+                            <button class="btn btn-primary">
+                                Book Appointment
+                            </button>
 
                         </form>
 

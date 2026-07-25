@@ -1,0 +1,115 @@
+{% extends "accounts/base_dashboard.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            <h3>Approve Appointment</h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <p>
+
+                <strong>Student:</strong>
+
+                {{ appointment.student.get_full_name }}
+
+            </p>
+
+            <p>
+
+                <strong>Date:</strong>
+
+                {{ appointment.appointment_date }}
+
+            </p>
+
+            <p>
+
+                <strong>Time:</strong>
+
+                {{ appointment.appointment_time }}
+
+            </p>
+
+            <p>
+
+                <strong>Appointment Type:</strong>
+
+                {{ appointment.appointment_type }}
+
+            </p>
+
+            <p>
+
+                <strong>Reason:</strong>
+
+                {{ appointment.reason }}
+
+            </p>
+
+            <hr>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                {% if appointment.appointment_type == "Online" %}
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Google Meet / Zoom Link
+
+                    </label>
+
+                    <input type="url" name="meeting_link" class="form-control" placeholder="https://meet.google.com/..."
+                        required>
+
+                </div>
+
+                {% else %}
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Meeting Location
+
+                    </label>
+
+                    <input type="text" name="meeting_location" class="form-control"
+                        placeholder="Counselling Office Room 3" required>
+
+                </div>
+
+                {% endif %}
+
+                <button class="btn btn-success">
+
+                    Approve Appointment
+
+                </button>
+
+                <a href="{% url 'pending_appointments' %}" class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

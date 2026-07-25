@@ -1,6 +1,5 @@
 from django import forms
-from .models import Appointment
-from .models import SessionNote
+from .models import Appointment, SessionNote
 
 
 class AppointmentForm(forms.ModelForm):
@@ -12,6 +11,7 @@ class AppointmentForm(forms.ModelForm):
         fields = [
             "appointment_date",
             "appointment_time",
+            "appointment_type",
             "reason",
         ]
 
@@ -20,21 +20,28 @@ class AppointmentForm(forms.ModelForm):
             "appointment_date": forms.DateInput(
                 attrs={
                     "type": "date",
-                    "class": "form-control"
+                    "class": "form-control",
                 }
             ),
 
             "appointment_time": forms.TimeInput(
                 attrs={
                     "type": "time",
-                    "class": "form-control"
+                    "class": "form-control",
+                }
+            ),
+
+            "appointment_type": forms.Select(
+                attrs={
+                    "class": "form-select",
                 }
             ),
 
             "reason": forms.Textarea(
                 attrs={
                     "rows": 4,
-                    "class": "form-control"
+                    "class": "form-control",
+                    "placeholder": "Briefly explain why you need the appointment.",
                 }
             ),
 
@@ -58,22 +65,36 @@ class SessionNoteForm(forms.ModelForm):
             "notes": forms.Textarea(
                 attrs={
                     "rows": 5,
-                    "class": "form-control"
+                    "class": "form-control",
                 }
             ),
 
             "recommendations": forms.Textarea(
                 attrs={
                     "rows": 4,
-                    "class": "form-control"
+                    "class": "form-control",
                 }
             ),
 
             "follow_up_date": forms.DateInput(
                 attrs={
                     "type": "date",
-                    "class": "form-control"
+                    "class": "form-control",
                 }
             ),
 
         }
+
+
+class RejectAppointmentForm(forms.Form):
+
+    rejection_reason = forms.CharField(
+        label="Reason for rejection",
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Enter the reason for rejecting this appointment..."
+            }
+        )
+    )

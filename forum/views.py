@@ -19,6 +19,7 @@ def forum_list(request):
     )
 
 
+
 @login_required
 def create_post(request):
 
@@ -32,6 +33,9 @@ def create_post(request):
 
             # Assign the logged-in user
             post.author = request.user
+
+            # Save anonymous checkbox
+            post.anonymous = form.cleaned_data["anonymous"]
 
             post.save()
 

@@ -53,8 +53,7 @@
         }
 
         .sidebar a:hover {
-            background: rgba(255, 255, 255, .18);
-            color: white;
+            background: rgba(255, 255, 255, .15);
         }
 
         .sidebar i {
@@ -91,8 +90,10 @@
             {% endif %}
 
             <h5 class="mt-3">
+
                 {{ request.user.first_name }}
                 {{ request.user.last_name }}
+
             </h5>
 
             <small>{{ role }}</small>
@@ -106,8 +107,6 @@
             Dashboard
         </a>
 
-        <!-- STUDENT -->
-
         {% if role == "Student" %}
 
         <a href="{% url 'mood_checkin' %}">
@@ -120,14 +119,17 @@
             Mood History
         </a>
 
+        <a href="{% url 'available_counsellors' %}">
+            <i class="fas fa-user-md"></i>
+            Available Counsellors
+        </a>
+
         <a href="{% url 'appointment_list' %}">
             <i class="fas fa-calendar-check"></i>
             Appointments
         </a>
 
         {% endif %}
-
-        <!-- COUNSELLOR -->
 
         {% if role == "Counsellor" or role == "Counselor" %}
 
@@ -143,7 +145,7 @@
 
         <a href="{% url 'counsellor_availability' %}">
             <i class="fas fa-user-clock"></i>
-            Availability
+            My Availability
         </a>
 
         <div class="text-center mt-3">
@@ -166,7 +168,7 @@
                 🔴 Offline
             </span>
 
-            {% elif profile.availability == "On Leave" %}
+            {% else %}
 
             <span class="badge bg-secondary">
                 🌴 On Leave
@@ -178,18 +180,14 @@
 
         {% endif %}
 
-        <!-- ADMIN -->
-
         {% if role == "Admin" or role == "Administrator" %}
 
         <a href="{% url 'view_students' %}">
             <i class="fas fa-users"></i>
-            Users
+            Manage Users
         </a>
 
         {% endif %}
-
-        <!-- EVERYONE -->
 
         <a href="{% url 'resource_list' %}">
             <i class="fas fa-book-open"></i>
@@ -199,6 +197,11 @@
         <a href="{% url 'forum_list' %}">
             <i class="fas fa-comments"></i>
             Forum
+        </a>
+
+        <a href="{% url 'notifications' %}">
+            <i class="fas fa-bell"></i>
+            Notifications
         </a>
 
         <a href="{% url 'profile' %}">
@@ -222,13 +225,9 @@
 
         <div class="topbar d-flex justify-content-between align-items-center">
 
-            <h4 class="mb-0">
-                Dashboard
-            </h4>
+            <h4>Dashboard</h4>
 
             <div>
-
-                <i class="fas fa-bell me-3"></i>
 
                 Welcome,
 
@@ -237,6 +236,20 @@
             </div>
 
         </div>
+
+        {% if messages %}
+
+        {% for message in messages %}
+
+        <div class="alert alert-{{ message.tags }}">
+
+            {{ message }}
+
+        </div>
+
+        {% endfor %}
+
+        {% endif %}
 
         {% block content %}
 

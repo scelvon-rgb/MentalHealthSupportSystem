@@ -3,13 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.http import FileResponse
 from django.core.mail import send_mail
 from django.conf import settings
-
+from accounts.models import UserProfile, Notification
+from accounts.models import Notification
 from accounts.models import UserProfile
-from .forms import AppointmentForm, SessionNoteForm
+from .forms import (
+    AppointmentForm,
+    SessionNoteForm,
+    RejectAppointmentForm,
+)
 from .models import Appointment, SessionNote
 from .reports import generate_appointment_report
 from .session_report import generate_session_note_report
-
+from django.contrib import messages
 import os
 
 
@@ -133,7 +138,6 @@ Thank you.
         )
 
     return redirect("appointment_list")
-
 @login_required
 def reject_appointment(request, appointment_id):
 
@@ -147,9 +151,62 @@ def reject_appointment(request, appointment_id):
         appointment_id=appointment_id
     )
 
-    appointment.status = "Rejected"
-    appointment.counselor = request.user
-    appointment.save()
+    if request.method == "POST":
+
+        form = RejectAppointmentForm(request.POST)
+
+        if form.is_valid():
+
+            appointment.status = "Rejected"
+            appointment.counselor = request.user
+            appointment.rejection_reason = form.cleaned_data["rejection_reason"]
+            appointment.save()
+
+            Notification.objects.create(
+                user=appointment.student,
+                title="Appointment Rejected",
+                message=f"Your appointment has been rejected.\n\nReason:\n{appointment.rejection_reason}"
+            )
+
+            send_mail(
+                subject="Appointment Rejected",
+                message=f"""
+Hello {appointment.student.first_name},
+
+Unfortunately your counselling appointment has been rejected.
+
+Reason:
+
+{appointment.rejection_reason}
+
+Please log into the Mental Health Support System to book another appointment.
+
+Regards,
+Mental Health Support System
+""",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[appointment.student.email],
+                fail_silently=False,
+            )
+
+            messages.success(request, "Appointment rejected successfully.")
+
+            return redirect("appointment_list")
+
+    else:
+
+        form = RejectAppointmentForm()
+
+    return render(
+        request,
+        "appointment_system/reject_appointment.html",
+        {
+            "form": form,
+            "appointment": appointment,
+            "profile": profile,
+            "role": profile.role.role_name,
+        },
+    )
 
     
 
@@ -297,4 +354,87 @@ def export_session_report(request, appointment_id):
         open(pdf_path, "rb"),
         as_attachment=True,
         filename=f"Session_Report_{appointment.appointment_id}.pdf"
+    )
+@login_required
+def pending_appointments(request):
+
+    profile = UserProfile.objects.get(user=request.user)
+
+    if profile.role.role_name != "Counsellor":
+        return redirect("dashboard")
+
+    appointments = Appointment.objects.filter(
+        status="Pending"
+    ).order_by("appointment_date", "appointment_time")
+
+    return render(
+        request,
+        "appointment_system/pending_appointments.html",
+        {
+            "appointments": appointments,
+        },
+    )
+@login_required
+def approve_appointment(request, appointment_id):
+
+    profile = UserProfile.objects.get(user=request.user)
+
+    if profile.role.role_name != "Counsellor":
+        return redirect("dashboard")
+
+    appointment = get_object_or_404(
+        Appointment,
+        appointment_id=appointment_id
+    )
+
+    if request.method == "POST":
+
+        appointment.counselor = request.user
+        appointment.status = "Approved"
+
+        if appointment.appointment_type == "Online":
+
+            appointment.meeting_link = request.POST.get(
+                "meeting_link"
+            )
+
+        else:
+
+            appointment.meeting_location = request.POST.get(
+                "meeting_location"
+            )
+
+        appointment.save()
+
+        messages.success(
+            request,
+            "Appointment approved successfully."
+        )
+
+        return redirect("pending_appointments")
+
+    return render(
+        request,
+        "appointment_system/approve_appointment.html",
+        {
+            "appointment": appointment
+        }
+    )
+@login_required
+def my_sessions(request):
+
+    appointments = Appointment.objects.filter(
+        counselor=request.user,
+        status="Approved"
+    ).order_by(
+        "appointment_date",
+        "appointment_time"
+    )
+
+    return render(
+        request,
+        "appointment_system/my_sessions.html",
+        {
+            "appointments": appointments
+        }
     )

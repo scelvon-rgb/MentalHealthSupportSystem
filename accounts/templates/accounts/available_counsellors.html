@@ -1,0 +1,78 @@
+{% extends "accounts/base_dashboard.html" %}
+{% block content %}
+
+<div class="container">
+
+    <h2 class="mb-4">
+        Available Counsellors
+    </h2>
+
+    <div class="row">
+
+        {% for counsellor in counsellors %}
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    {% if counsellor.profile_picture %}
+                    <img src="{{ counsellor.profile_picture.url }}" width="80" height="80" class="rounded-circle mb-3">
+                    {% endif %}
+
+                    <h4>
+                        {{ counsellor.user.get_full_name }}
+                    </h4>
+
+                    <p>
+                        {{ counsellor.user.email }}
+                    </p>
+
+                    {% if counsellor.availability == "Available" %}
+
+                    <span class="badge bg-success">
+                        🟢 Available
+                    </span>
+
+                    {% elif counsellor.availability == "Busy" %}
+
+                    <span class="badge bg-warning text-dark">
+                        🟡 Busy
+                    </span>
+
+                    {% elif counsellor.availability == "Offline" %}
+
+                    <span class="badge bg-danger">
+                        🔴 Offline
+                    </span>
+
+                    {% else %}
+
+                    <span class="badge bg-secondary">
+                        🌴 On Leave
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="alert alert-info">
+
+            No counsellors available.
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
