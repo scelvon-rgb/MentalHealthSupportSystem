@@ -553,9 +553,8 @@ def approve_counsellor(request, profile_id):
 
     return redirect("manage_users")
 
-
 @login_required
-def reject_counsellor(request, user_id):
+def reject_counsellor(request, profile_id):
 
     admin = UserProfile.objects.get(user=request.user)
 
@@ -563,7 +562,7 @@ def reject_counsellor(request, user_id):
         messages.error(request, "Access denied.")
         return redirect("dashboard")
 
-    profile = UserProfile.objects.get(user_id=user_id)
+    profile = UserProfile.objects.get(profile_id=profile_id)
 
     if request.method == "POST":
 
