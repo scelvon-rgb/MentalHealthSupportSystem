@@ -17,34 +17,21 @@ Reject Counsellor
         <div class="card-body">
 
             <form method="POST">
+    {% csrf_token %}
 
-                {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Reason for rejection</label>
+        <textarea name="reason" class="form-control" rows="5" required></textarea>
+    </div>
 
-                <div class="mb-3">
+    <button type="submit" class="btn btn-danger">
+        Reject Counsellor
+    </button>
 
-                    <label class="form-label">
-                        Reason for rejection
-                    </label>
-
-                    <textarea
-                        name="reason"
-                        class="form-control"
-                        rows="5"
-                        required
-                        placeholder="Enter the reason for rejecting this counsellor..."
-                    ></textarea>
-
-                </div>
-
-                <button type="submit" class="btn btn-danger">
-                    Reject Counsellor
-                </button>
-
-                <a href="{% url 'manage_users' %}" class="btn btn-secondary">
-                    Cancel
-                </a>
-
-            </form>
+    <a href="{% url 'manage_users' %}" class="btn btn-secondary">
+        Cancel
+    </a>
+</form>
 
         </div>
 

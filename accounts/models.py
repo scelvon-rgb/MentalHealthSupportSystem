@@ -96,3 +96,22 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.title
+    status = models.CharField(
+    max_length=20,
+    choices=[
+        ("Pending", "Pending"),
+        ("Approved", "Approved"),
+        ("Rejected", "Rejected"),
+    ],
+    default="Pending"
+)
+    status = models.CharField(
+    max_length=20,
+    choices=[
+        ("Pending", "Pending"),
+        ("Approved", "Approved"),
+        ("Rejected", "Rejected"),
+    ],
+    default="Pending"
+)
+    

@@ -552,7 +552,6 @@ def approve_counsellor(request, profile_id):
     messages.success(request, "Counsellor approved successfully.")
 
     return redirect("manage_users")
-
 @login_required
 def reject_counsellor(request, profile_id):
 
@@ -568,14 +567,29 @@ def reject_counsellor(request, profile_id):
 
         reason = request.POST.get("reason")
 
+        print("========== REJECT DEBUG ==========")
+        print("Profile ID:", profile.profile_id)
+        print("Before:", profile.is_approved, profile.rejection_reason)
+
         profile.is_approved = False
+
+        # Remove these two lines if you have NOT added the status field yet
+        profile.status = "Rejected"
+
         profile.rejection_reason = reason
         profile.save()
+
+        profile.refresh_from_db()
+
+        print("After:", profile.is_approved, profile.rejection_reason)
 
         Notification.objects.create(
             user=profile.user,
             title="Counsellor Registration Rejected",
-            message=f"Your registration request has been rejected.\n\nReason:\n{reason}"
+            message=(
+                f"Your counsellor registration has been rejected.\n\n"
+                f"Reason:\n{reason}"
+            )
         )
 
         messages.success(request, "Counsellor rejected successfully.")
