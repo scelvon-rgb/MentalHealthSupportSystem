@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-
+from django.db.models import Q
 from .forms import RegistrationForm, ProfileForm, AdminUserCreationForm
 from .models import UserProfile, Role, Notification
 
@@ -497,26 +497,34 @@ def manage_users(request):
 
     profile = UserProfile.objects.get(user=request.user)
 
+    # Only admins can access
     if profile.role.role_name not in ["Admin", "Administrator"]:
         messages.error(request, "Access denied.")
         return redirect("dashboard")
 
     users = UserProfile.objects.select_related(
-    "user",
-    "role"
-).order_by("user__first_name")
+        "user",
+        "role"
+    ).order_by("user__first_name")
 
     search = request.GET.get("search")
 
     if search:
         users = users.filter(
-            user__first_name__icontains=search
-        ) | users.filter(
-            user__last_name__icontains=search
-        ) | users.filter(
-            user__username__icontains=search
-        ) | users.filter(
-            user__email__icontains=search
+            Q(user__first_name__icontains=search) |
+            Q(user__last_name__icontains=search) |
+            Q(user__username__icontains=search) |
+            Q(user__email__icontains=search)
+        )
+
+    # DEBUG
+    for u in users:
+        print(
+            f"ID={u.profile_id}, "
+            f"User={u.user.username}, "
+            f"Role={u.role.role_name}, "
+            f"Approved={u.is_approved}, "
+            f"Reason={u.rejection_reason}"
         )
 
     return render(

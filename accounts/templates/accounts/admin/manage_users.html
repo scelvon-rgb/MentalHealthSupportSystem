@@ -69,112 +69,114 @@ Manage Users
 
                     {% for user in users %}
 
-                    <tr>
+<tr>
 
-                        <td>
+    <td>
 
-                            {% if user.profile_picture %}
+        {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" width="45" height="45" class="rounded-circle">
+        {% else %}
+            <img src="https://ui-avatars.com/api/?name={{ user.user.first_name }}+{{ user.user.last_name }}"
+                 width="45" class="rounded-circle">
+        {% endif %}
 
-                            <img src="{{ user.profile_picture.url }}" width="45" height="45" class="rounded-circle">
+    </td>
 
-                            {% else %}
+    <td>
+        {{ user.user.first_name }} {{ user.user.last_name }}
+    </td>
 
-                            <img src="https://ui-avatars.com/api/?name={{ user.user.first_name }}+{{ user.user.last_name }}"
-                                width="45" class="rounded-circle">
+    <td>
+        {{ user.user.username }}
+    </td>
 
-                            {% endif %}
+    <td>
+        {{ user.user.email }}
+    </td>
 
-                        </td>
+    <td>
+        <span class="badge bg-primary">
+            {{ user.role.role_name }}
+        </span>
+    </td>
 
-                        <td>
-                            {{ user.user.first_name }}
-                            {{ user.user.last_name }}
-                        </td>
+    <!-- STATUS -->
+    <td>
 
-                        <td>
-                            {{ user.user.username }}
-                        </td>
+        {% if user.role.role_name == "Counsellor" %}
 
-                        <td>
-                            {{ user.user.email }}
-                        </td>
+            {% if user.is_approved %}
 
-                        <td>
+                <span class="badge bg-success">
+                    Approved
+                </span>
 
-                            <span class="badge bg-primary">
-                                {{ user.role.role_name }}
-                            </span>
+            {% elif user.rejection_reason %}
 
-                        </td>
+                <span class="badge bg-danger">
+                    Rejected
+                </span>
 
-                        <td>
+            {% else %}
 
-    {% if user.role.role_name == "Counsellor" %}
+                <span class="badge bg-warning text-dark">
+                    Pending Approval
+                </span>
 
-        {% if not user.is_approved and not user.rejection_reason %}
+            {% endif %}
 
-            <a href="{% url 'approve_counsellor' user.profile_id %}"
-               class="btn btn-success btn-sm">
-                Approve
-            </a>
+        {% else %}
 
-            <a href="{% url 'reject_counsellor' user.profile_id %}"
-               class="btn btn-danger btn-sm">
-                Reject
-            </a>
+            <span class="badge bg-success">
+                Active
+            </span>
 
         {% endif %}
 
-    {% endif %}
+    </td>
 
-    <a href="#" class="btn btn-warning btn-sm">
-        Edit
-    </a>
+    <!-- ACTIONS -->
+    <td>
 
-    <a href="#" class="btn btn-danger btn-sm">
-        Delete
-    </a>
+        {% if user.role.role_name == "Counsellor" %}
 
-</td>
-                        <td>
+            {% if not user.is_approved and not user.rejection_reason %}
 
-                            {% if user.role.role_name == "Counsellor" and not user.is_approved %}
+                <a href="{% url 'approve_counsellor' user.profile_id %}"
+                   class="btn btn-success btn-sm">
+                    Approve
+                </a>
 
-                            <a href="{% url 'approve_counsellor' user.profile_id %}" class="btn btn-success btn-sm">
-                                Approve
-                            </a>
+                <a href="{% url 'reject_counsellor' user.profile_id %}"
+                   class="btn btn-danger btn-sm">
+                    Reject
+                </a>
 
-                           <a href="{% url 'reject_counsellor' user.profile_id %}" class="btn btn-danger btn-sm">
-    Reject
-</a>
+            {% endif %}
 
-                            {% endif %}
+        {% endif %}
 
-                            <a href="#" class="btn btn-warning btn-sm">
-                                Edit
-                            </a>
+        <a href="#" class="btn btn-warning btn-sm">
+            Edit
+        </a>
 
-                            <a href="#" class="btn btn-danger btn-sm">
-                                Delete
-                            </a>
+        <a href="#" class="btn btn-danger btn-sm">
+            Delete
+        </a>
 
-                        </td>
+    </td>
 
-                    </tr>
+</tr>
 
-                    {% empty %}
+{% empty %}
 
-                    <tr>
+<tr>
+    <td colspan="7" class="text-center py-4">
+        No users found.
+    </td>
+</tr>
 
-                        <td colspan="7" class="text-center py-4">
-
-                            No users found.
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
+{% endfor %}
 
                 </tbody>
 
