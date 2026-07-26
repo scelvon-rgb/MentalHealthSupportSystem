@@ -469,17 +469,37 @@ def add_user(request):
                 last_name=form.cleaned_data["last_name"],
             )
 
+            selected_role = form.cleaned_data["role"]
+
+            # Students and Admins are approved automatically
+            approved = True
+
+            # Counsellors must wait for approval
+            if selected_role.role_name == "Counsellor":
+                approved = False
+
             UserProfile.objects.create(
                 user=user,
-                role=form.cleaned_data["role"],
+                role=selected_role,
                 phone="",
                 student_reg_no="",
+                is_approved=approved,
             )
+
+            # Notify counsellors
+            if not approved:
+
+                Notification.objects.create(
+                    user=user,
+                    title="Registration Submitted",
+                    message="Your counsellor account is waiting for administrator approval."
+                )
 
             messages.success(request, "User created successfully.")
             return redirect("manage_users")
 
     else:
+
         form = AdminUserCreationForm()
 
     return render(
@@ -575,29 +595,14 @@ def reject_counsellor(request, profile_id):
 
         reason = request.POST.get("reason")
 
-        print("========== REJECT DEBUG ==========")
-        print("Profile ID:", profile.profile_id)
-        print("Before:", profile.is_approved, profile.rejection_reason)
-
         profile.is_approved = False
-
-        # Remove these two lines if you have NOT added the status field yet
-        profile.status = "Rejected"
-
         profile.rejection_reason = reason
-        profile.save()
-
-        profile.refresh_from_db()
-
-        print("After:", profile.is_approved, profile.rejection_reason)
+        profile.save(update_fields=["is_approved", "rejection_reason"])
 
         Notification.objects.create(
             user=profile.user,
             title="Counsellor Registration Rejected",
-            message=(
-                f"Your counsellor registration has been rejected.\n\n"
-                f"Reason:\n{reason}"
-            )
+            message=f"Your counsellor registration has been rejected.\n\nReason:\n{reason}"
         )
 
         messages.success(request, "Counsellor rejected successfully.")
