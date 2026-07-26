@@ -451,56 +451,42 @@ def add_user(request):
 
     profile = UserProfile.objects.get(user=request.user)
 
-    # Only admins can add users
     if profile.role.role_name not in ["Admin", "Administrator"]:
         messages.error(request, "Access denied.")
         return redirect("dashboard")
 
     if request.method == "POST":
 
-        first_name = request.POST["first_name"]
-        last_name = request.POST["last_name"]
-        username = request.POST["username"]
-        email = request.POST["email"]
-        password = request.POST["password"]
-        role_name = request.POST["role"]
+        form = AdminUserCreationForm(request.POST)
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists.")
-            return redirect("add_user")
+        if form.is_valid():
 
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "Email already exists.")
-            return redirect("add_user")
+            user = User.objects.create_user(
+                username=form.cleaned_data["username"],
+                email=form.cleaned_data["email"],
+                password=form.cleaned_data["password"],
+                first_name=form.cleaned_data["first_name"],
+                last_name=form.cleaned_data["last_name"],
+            )
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-        )
+            UserProfile.objects.create(
+                user=user,
+                role=form.cleaned_data["role"],
+                phone="",
+                student_reg_no="",
+            )
 
-        role = Role.objects.get(role_name=role_name)
+            messages.success(request, "User created successfully.")
+            return redirect("manage_users")
 
-        UserProfile.objects.create(
-            user=user,
-            role=role,
-            phone="",
-            student_reg_no=""
-        )
-
-        messages.success(request, "User created successfully.")
-
-        return redirect("manage_users")
-
-    roles = Role.objects.all()
+    else:
+        form = AdminUserCreationForm()
 
     return render(
         request,
         "accounts/admin/add_user.html",
         {
-            "roles": roles,
+            "form": form,
             "profile": profile,
             "role": profile.role.role_name,
             "active_page": "manage_users",

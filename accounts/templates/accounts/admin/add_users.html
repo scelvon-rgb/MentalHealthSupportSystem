@@ -96,19 +96,21 @@ Add User
                                 Role
                             </label>
 
-                            <select name="role" class="form-select" required>
+                           <div class="mb-4">
 
-                                {% for role in roles %}
+    <label class="form-label">
+        Role
+    </label>
 
-                                <option value="{{ role.role_name }}">
-                                    {{ role.role_name }}
-                                </option>
+    {{ form.role }}
 
-                                {% endfor %}
+    {% if form.role.errors %}
+        <div class="text-danger mt-1">
+            {{ form.role.errors }}
+        </div>
+    {% endif %}
 
-                            </select>
-
-                        </div>
+</div>
 
                         <button type="submit" class="btn btn-success">
                             Create User
