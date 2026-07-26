@@ -109,30 +109,35 @@ Manage Users
 
                         <td>
 
-                            {% if user.role.role_name == "Counsellor" %}
+                           {% if user.role.role_name == "Counsellor" and not user.is_approved and not user.rejection_reason %}
 
-                            {% if user.is_approved %}
+    {% if user.is_approved %}
 
-                            <span class="badge bg-success">
-                                Approved
-                            </span>
+        <span class="badge bg-success">
+            Approved
+        </span>
 
-                            {% else %}
+    {% elif user.rejection_reason %}
 
-                            <span class="badge bg-warning text-dark">
-                                Pending Approval
-                            </span>
+        <span class="badge bg-danger">
+            Rejected
+        </span>
 
-                            {% endif %}
+    {% else %}
 
-                            {% else %}
+        <span class="badge bg-warning text-dark">
+            Pending Approval
+        </span>
 
-                            <span class="badge bg-success">
-                                Active
-                            </span>
+    {% endif %}
 
-                            {% endif %}
+{% else %}
 
+    <span class="badge bg-success">
+        Active
+    </span>
+
+{% endif %}
                         </td>
 
                         <td>
