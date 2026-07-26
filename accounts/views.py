@@ -557,6 +557,10 @@ def manage_users(request):
             "active_page": "manage_users",
         },
     )
+from django.core.mail import send_mail
+from django.conf import settings
+
+
 @login_required
 def approve_counsellor(request, profile_id):
 
@@ -569,12 +573,33 @@ def approve_counsellor(request, profile_id):
     profile = UserProfile.objects.get(profile_id=profile_id)
 
     profile.is_approved = True
+    profile.rejection_reason = ""
     profile.save()
 
     Notification.objects.create(
         user=profile.user,
         title="Account Approved",
-        message="Your counsellor account has been approved. You can now log in."
+        message="Congratulations! Your counsellor account has been approved. You can now log in."
+    )
+
+    # Send approval email
+    send_mail(
+        subject="Counsellor Account Approved",
+        message=f"""
+Hello {profile.user.first_name},
+
+Congratulations!
+
+Your counsellor account has been approved by the administrator.
+
+You can now log in to the Mental Health Support System using your username and password.
+
+Regards,
+Mental Health Support System Team
+""",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[profile.user.email],
+        fail_silently=False,
     )
 
     messages.success(request, "Counsellor approved successfully.")
