@@ -1,0 +1,55 @@
+{% extends "accounts/dashboard/base_dashboard.html" %}
+
+{% block page_title %}
+Reject Counsellor
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-danger text-white">
+            <h3>Reject Counsellor</h3>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Reason for rejection
+                    </label>
+
+                    <textarea
+                        name="reason"
+                        class="form-control"
+                        rows="5"
+                        required
+                        placeholder="Enter the reason for rejecting this counsellor..."
+                    ></textarea>
+
+                </div>
+
+                <button type="submit" class="btn btn-danger">
+                    Reject Counsellor
+                </button>
+
+                <a href="{% url 'manage_users' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

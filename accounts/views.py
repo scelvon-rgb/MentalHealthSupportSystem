@@ -555,7 +555,7 @@ def approve_counsellor(request, profile_id):
 
 
 @login_required
-def reject_counsellor(request, profile_id):
+def reject_counsellor(request, user_id):
 
     admin = UserProfile.objects.get(user=request.user)
 
@@ -563,19 +563,32 @@ def reject_counsellor(request, profile_id):
         messages.error(request, "Access denied.")
         return redirect("dashboard")
 
-    profile = UserProfile.objects.get(profile_id=profile_id)
+    profile = UserProfile.objects.get(user_id=user_id)
 
-    Notification.objects.create(
-        user=profile.user,
-        title="Account Rejected",
-        message="Your counsellor registration has been rejected."
+    if request.method == "POST":
+
+        reason = request.POST.get("reason")
+
+        profile.is_approved = False
+        profile.rejection_reason = reason
+        profile.save()
+
+        Notification.objects.create(
+            user=profile.user,
+            title="Counsellor Registration Rejected",
+            message=f"Your registration request has been rejected.\n\nReason:\n{reason}"
+        )
+
+        messages.success(request, "Counsellor rejected successfully.")
+        return redirect("manage_users")
+
+    return render(
+        request,
+        "accounts/admin/reject_counsellor.html",
+        {
+            "profile": profile,
+        },
     )
-
-    profile.user.delete()
-
-    messages.success(request, "Counsellor rejected.")
-
-    return redirect("manage_users")
 @login_required
 def add_user(request):
 

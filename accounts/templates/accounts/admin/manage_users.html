@@ -143,9 +143,9 @@ Manage Users
                                 Approve
                             </a>
 
-                            <a href="{% url 'reject_counsellor' user.profile_id %}" class="btn btn-danger btn-sm">
-                                Reject
-                            </a>
+                            <a href="{% url 'reject_counsellor' user.userprofile.profile_id %}" class="btn btn-danger btn-sm">
+    Reject
+</a>
 
                             {% endif %}
 
