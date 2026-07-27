@@ -461,23 +461,19 @@ def add_user(request):
 
         if form.is_valid():
 
-            user = User.objects.create_user(
-                username=form.cleaned_data["username"],
-                email=form.cleaned_data["email"],
-                password=form.cleaned_data["password"],
-                first_name=form.cleaned_data["first_name"],
-                last_name=form.cleaned_data["last_name"],
-            )
+            # Create user
+            user = form.save(commit=False)
+            password = form.cleaned_data["password"]
+            user.set_password(password)
+            user.save()
 
+            # Selected role
             selected_role = form.cleaned_data["role"]
 
-            # Students and Admins are approved automatically
-            approved = True
+            # Counsellors require approval
+            approved = selected_role.role_name != "Counsellor"
 
-            # Counsellors must wait for approval
-            if selected_role.role_name == "Counsellor":
-                approved = False
-
+            # Create profile
             UserProfile.objects.create(
                 user=user,
                 role=selected_role,
@@ -486,16 +482,117 @@ def add_user(request):
                 is_approved=approved,
             )
 
-            # Notify counsellors
+            # Notification for counsellors
             if not approved:
-
                 Notification.objects.create(
                     user=user,
                     title="Registration Submitted",
-                    message="Your counsellor account is waiting for administrator approval."
+                    message="Your counsellor account has been created and is awaiting administrator approval."
                 )
 
-            messages.success(request, "User created successfully.")
+            # --------------------------------
+            # Email subject & message
+            # --------------------------------
+
+            if selected_role.role_name == "Student":
+
+                subject = "Student Account Created"
+
+                message = f"""
+Hello {user.first_name},
+
+Your Student account has been created successfully.
+
+Username:
+{user.username}
+
+You can now log into the Mental Health Support System.
+
+Regards,
+Mental Health Support System
+"""
+
+            elif selected_role.role_name == "Admin":
+
+                subject = "Administrator Account Created"
+
+                message = f"""
+Hello {user.first_name},
+
+Your Administrator account has been created successfully.
+
+Username:
+{user.username}
+
+You can now log into the Mental Health Support System.
+
+Regards,
+Mental Health Support System
+"""
+
+            else:
+
+                subject = "Counsellor Registration Received"
+
+                message = f"""
+Hello {user.first_name},
+
+Your counsellor account has been created successfully.
+
+Your account is waiting for administrator approval.
+
+You will receive another email once your account has been approved.
+
+Regards,
+Mental Health Support System
+"""
+
+            # --------------------------------
+            # Email to new user
+            # --------------------------------
+
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                )
+                print("USER EMAIL SENT")
+
+            except Exception as e:
+                print("USER EMAIL ERROR:", e)
+
+            # --------------------------------
+            # Email to admin
+            # --------------------------------
+
+            try:
+                send_mail(
+                    subject="New User Added",
+                    message=f"""
+A new user has been added.
+
+Name: {user.first_name} {user.last_name}
+Username: {user.username}
+Email: {user.email}
+Role: {selected_role.role_name}
+""",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[request.user.email],
+                    fail_silently=False,
+                )
+                print("ADMIN EMAIL SENT")
+
+            except Exception as e:
+                print("ADMIN EMAIL ERROR:", e)
+
+            messages.success(
+                request,
+                f"{selected_role.role_name} added successfully."
+            )
+
             return redirect("manage_users")
 
     else:
@@ -504,54 +601,9 @@ def add_user(request):
 
     return render(
         request,
-        "accounts/admin/add_user.html",
+        "accounts/admin/add_users.html",
         {
             "form": form,
-            "profile": profile,
-            "role": profile.role.role_name,
-            "active_page": "manage_users",
-        },
-    )
-@login_required
-def manage_users(request):
-
-    profile = UserProfile.objects.get(user=request.user)
-
-    # Only admins can access
-    if profile.role.role_name not in ["Admin", "Administrator"]:
-        messages.error(request, "Access denied.")
-        return redirect("dashboard")
-
-    users = UserProfile.objects.select_related(
-        "user",
-        "role"
-    ).order_by("user__first_name")
-
-    search = request.GET.get("search")
-
-    if search:
-        users = users.filter(
-            Q(user__first_name__icontains=search) |
-            Q(user__last_name__icontains=search) |
-            Q(user__username__icontains=search) |
-            Q(user__email__icontains=search)
-        )
-
-    # DEBUG
-    for u in users:
-        print(
-            f"ID={u.profile_id}, "
-            f"User={u.user.username}, "
-            f"Role={u.role.role_name}, "
-            f"Approved={u.is_approved}, "
-            f"Reason={u.rejection_reason}"
-        )
-
-    return render(
-        request,
-        "accounts/admin/manage_users.html",
-        {
-            "users": users,
             "profile": profile,
             "role": profile.role.role_name,
             "active_page": "manage_users",

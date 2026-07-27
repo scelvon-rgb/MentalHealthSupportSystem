@@ -479,6 +479,36 @@
     {% block scripts %}
 
     {% endblock %}
+    <div id="offline-banner"
+     style="display:none;
+            position:fixed;
+            top:20px;
+            left:50%;
+            transform:translateX(-50%);
+            background:#dc3545;
+            color:white;
+            padding:15px 25px;
+            border-radius:8px;
+            z-index:9999;">
+
+    You are offline.
+
+    <button onclick="location.reload()"
+            class="btn btn-light btn-sm ms-3">
+        Reload Page
+    </button>
+
+</div>
+
+<script>
+window.addEventListener("offline", function () {
+    document.getElementById("offline-banner").style.display = "block";
+});
+
+window.addEventListener("online", function () {
+    document.getElementById("offline-banner").style.display = "none";
+});
+</script>
 
 </body>
 
