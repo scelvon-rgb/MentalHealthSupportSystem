@@ -481,7 +481,52 @@ def reject_counsellor(request, profile_id):
         {
             "profile": profile,
         },
+    )@login_required
+def approve_counsellor(request, profile_id):
+
+    admin = UserProfile.objects.get(user=request.user)
+
+    if admin.role.role_name not in ["Admin", "Administrator"]:
+        messages.error(request, "Access denied.")
+        return redirect("dashboard")
+
+    profile = UserProfile.objects.get(profile_id=profile_id)
+
+    profile.is_approved = True
+    profile.rejection_reason = ""
+    profile.save()
+
+    Notification.objects.create(
+        user=profile.user,
+        title="Account Approved",
+        message="Congratulations! Your counsellor account has been approved. You can now log in."
     )
+
+    try:
+        send_mail(
+            subject="Counsellor Account Approved",
+            message=f"""
+Hello {profile.user.first_name},
+
+Congratulations!
+
+Your counsellor account has been approved by the administrator.
+
+You can now log in to the Mental Health Support System.
+
+Regards,
+Mental Health Support System Team
+""",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[profile.user.email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        print("EMAIL ERROR:", e)
+
+    messages.success(request, "Counsellor approved successfully.")
+
+    return redirect("manage_users")
 @login_required
 def add_user(request):
 
