@@ -656,15 +656,13 @@ def add_user(request):
         if form.is_valid():
 
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data["password"])
+            password = form.cleaned_data["password"]
+            user.set_password(password)
             user.save()
 
             selected_role = form.cleaned_data["role"]
 
-            approved = True
-
-            if selected_role.role_name == "Counsellor":
-                approved = False
+            approved = selected_role.role_name != "Counsellor"
 
             UserProfile.objects.create(
                 user=user,
@@ -674,23 +672,107 @@ def add_user(request):
                 is_approved=approved,
             )
 
+            # -----------------------
+            # Notification
+            # -----------------------
             if not approved:
-
                 Notification.objects.create(
                     user=user,
                     title="Registration Submitted",
-                    message="Your counsellor account is waiting for administrator approval."
+                    message="Your counsellor account has been created and is awaiting administrator approval."
                 )
+
+            # -----------------------
+            # Email to new user
+            # -----------------------
+            if selected_role.role_name == "Student":
+
+                subject = "Student Account Created"
+
+                message = f"""
+Hello {user.first_name},
+
+Your Student account has been created successfully.
+
+Username:
+{user.username}
+
+You can now log into the Mental Health Support System.
+
+Regards,
+Mental Health Support System
+"""
+
+            elif selected_role.role_name == "Admin":
+
+                subject = "Administrator Account Created"
+
+                message = f"""
+Hello {user.first_name},
+
+Your Administrator account has been created successfully.
+
+Username:
+{user.username}
+
+You can now log into the Mental Health Support System.
+
+Regards,
+Mental Health Support System
+"""
+
+            else:
+
+                subject = "Counsellor Registration Received"
+
+                message = f"""
+Hello {user.first_name},
+
+Your Counsellor account has been created successfully.
+
+It is currently waiting for administrator approval.
+
+You will receive another email once your account has been approved.
+
+Regards,
+Mental Health Support System
+"""
+
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+
+            # -----------------------
+            # Email to administrator
+            # -----------------------
+
+            send_mail(
+                "New User Added",
+                f"""
+A new user has been added.
+
+Name: {user.first_name} {user.last_name}
+Username: {user.username}
+Email: {user.email}
+Role: {selected_role.role_name}
+""",
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email],
+                fail_silently=False,
+            )
 
             messages.success(
                 request,
-                "User created successfully."
+                f"{selected_role.role_name} added successfully."
             )
 
             return redirect("manage_users")
 
     else:
-
         form = AdminUserCreationForm()
 
     return render(
